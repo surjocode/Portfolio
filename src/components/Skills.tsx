@@ -68,7 +68,7 @@ export default function Skills() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: false, amount: 0.2 }}
           transition={{ duration: 0.6 }}
           className="text-center max-w-2xl mx-auto mb-14"
         >
@@ -108,7 +108,7 @@ export default function Skills() {
               key={cat.title}
               initial={{ opacity: 0, y: 25 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: false, amount: 0.2 }}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
               className="flex flex-col h-full rounded-2xl bg-white/90 dark:bg-surface-card/80 border border-slate-200 dark:border-slate-800/90 p-6 hover:border-cyan-500/40 hover:shadow-neon-glow transition-all duration-300 group backdrop-blur-md shadow-md dark:shadow-xl"
             >

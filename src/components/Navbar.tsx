@@ -58,27 +58,27 @@ export default function Navbar() {
           : "bg-transparent py-5"
       }`}
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between gap-4">
           {/* Logo / Branding */}
           <Link
             href="#hero"
-            className="group flex items-center gap-2.5 text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors hover:text-cyan-600 dark:hover:text-cyan-300"
+            className="shrink-0 group flex items-center gap-2.5 text-base sm:text-lg lg:text-xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors hover:text-cyan-600 dark:hover:text-cyan-300"
             onClick={closeMenu}
             aria-label="Piel Mitra Home"
           >
-            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-cyan-500/10 dark:bg-gradient-to-br dark:from-cyan-500/15 dark:via-purple-500/15 dark:to-transparent border border-cyan-500/30 text-cyan-600 dark:text-cyan-400 group-hover:border-cyan-400 group-hover:shadow-neon-cyan transition-all">
-              <Terminal className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+            <div className="shrink-0 flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-cyan-500/10 dark:bg-gradient-to-br dark:from-cyan-500/15 dark:via-purple-500/15 dark:to-transparent border border-cyan-500/30 text-cyan-600 dark:text-cyan-400 group-hover:border-cyan-400 group-hover:shadow-neon-cyan transition-all">
+              <Terminal className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-600 dark:text-cyan-400" />
             </div>
-            <span className="font-mono">
+            <span className="font-mono whitespace-nowrap flex items-center">
               {siteConfig.name}
-              <span className="text-cyan-500 dark:text-cyan-400 inline-block animate-pulse">_</span>
+              <span className="text-cyan-500 dark:text-cyan-400 inline-block animate-pulse ml-0.5">_</span>
             </span>
           </Link>
 
-          {/* Desktop Navigation Links */}
+          {/* Desktop & Tablet Navigation Links */}
           <nav
-            className="hidden md:flex items-center gap-1 bg-white/80 dark:bg-surface-card/80 border border-slate-200 dark:border-slate-800/80 rounded-full px-4 py-1.5 backdrop-blur-md shadow-sm dark:shadow-inner"
+            className="hidden md:flex items-center gap-0.5 lg:gap-1 bg-white/80 dark:bg-surface-card/80 border border-slate-200 dark:border-slate-800/80 rounded-full px-2.5 lg:px-4 py-1.5 backdrop-blur-md shadow-sm dark:shadow-inner shrink-0"
             aria-label="Main Navigation"
           >
             {navLinks.map((link) => {
@@ -88,7 +88,7 @@ export default function Navbar() {
                 <a
                   key={link.label}
                   href={link.href}
-                  className={`px-4 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ${
+                  className={`px-3 lg:px-4 py-1 text-xs lg:text-sm font-medium rounded-full transition-all duration-200 whitespace-nowrap ${
                     isActive
                       ? "text-cyan-700 dark:text-cyan-300 bg-cyan-500/15 border border-cyan-500/30 shadow-sm shadow-cyan-500/20"
                       : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50"
@@ -100,13 +100,13 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* Right Action Buttons (Desktop) */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Right Action Buttons */}
+          <div className="hidden md:flex items-center gap-2 lg:gap-3 shrink-0">
             {/* Theme Toggle Button */}
             <button
               type="button"
               onClick={toggleTheme}
-              className="p-2.5 rounded-xl text-slate-700 hover:text-cyan-600 dark:text-slate-300 dark:hover:text-cyan-300 bg-slate-100 dark:bg-surface-card hover:bg-slate-200 dark:hover:bg-surface-elevated border border-slate-200 dark:border-slate-800 transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer shadow-sm active:scale-95"
+              className="p-2 lg:p-2.5 rounded-xl text-slate-700 hover:text-cyan-600 dark:text-slate-300 dark:hover:text-cyan-300 bg-slate-100 dark:bg-surface-card hover:bg-slate-200 dark:hover:bg-surface-elevated border border-slate-200 dark:border-slate-800 transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer shadow-sm active:scale-95 shrink-0"
               aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
               title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
             >
@@ -120,10 +120,10 @@ export default function Navbar() {
             {/* Quick Resume Download Action */}
             <ResumeButton variant="nav" label="Resume" />
 
-            {/* Contact Action */}
+            {/* Contact Action (Visible on lg+ screens to give tablet breathing room) */}
             <a
               href="#contact"
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-slate-950 bg-gradient-to-r from-cyan-400 to-teal-300 hover:from-cyan-300 hover:to-teal-200 rounded-lg transition-all duration-200 shadow-neon-cyan hover:shadow-cyan-400/40 active:scale-[0.98]"
+              className="hidden lg:inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-slate-950 bg-gradient-to-r from-cyan-400 to-teal-300 hover:from-cyan-300 hover:to-teal-200 rounded-lg transition-all duration-200 shadow-neon-cyan hover:shadow-cyan-400/40 active:scale-[0.98] shrink-0"
             >
               <span>Get in Touch</span>
               <ArrowUpRight className="w-4 h-4" />

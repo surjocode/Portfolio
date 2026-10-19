@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
 import Hero3DObject from "./Hero3DObject";
 
 // Graceful Fallback if WebGL is unavailable or during reduced motion
@@ -45,12 +46,21 @@ export default function CyberCanvas() {
 
     mediaQuery.addEventListener("change", handleMediaChange);
 
-    // Test WebGL availability
+    // Test WebGL availability and release context to avoid context leaks
     try {
       const canvas = document.createElement("canvas");
       const gl =
-        canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-      setHasWebGL(Boolean(gl));
+        canvas.getContext("webgl2") ||
+        canvas.getContext("webgl") ||
+        canvas.getContext("experimental-webgl");
+      const supported = Boolean(gl);
+      if (gl) {
+        const ext = (gl as WebGLRenderingContext).getExtension("WEBGL_lose_context");
+        if (ext) {
+          ext.loseContext();
+        }
+      }
+      setHasWebGL(supported);
     } catch {
       setHasWebGL(false);
     }
@@ -92,6 +102,13 @@ export default function CyberCanvas() {
         className="w-full h-full relative z-10"
       >
         <Suspense fallback={null}>
+          <OrbitControls
+            enableZoom={false}
+            enablePan={false}
+            rotateSpeed={0.8}
+            dampingFactor={0.06}
+            autoRotate={false}
+          />
           <Hero3DObject reducedMotion={prefersReducedMotion} />
         </Suspense>
       </Canvas>

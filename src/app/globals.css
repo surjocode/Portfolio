@@ -223,48 +223,36 @@ html.light .shadow-inner {
   box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.04);
 }
 
-/* Replace ordinary desktop mouse pointer with custom particle trail on fine-pointer devices */
-@media (pointer: fine) and (min-width: 768px) {
-  body {
-    cursor: none;
-  }
-  a,
-  button,
-  input,
-  textarea,
-  select,
-  [role="button"],
-  label,
-  .cursor-pointer {
-    cursor: pointer !important;
-  }
-  .cursor-grab {
-    cursor: grab !important;
-  }
-  .cursor-grabbing {
-    cursor: grabbing !important;
-  }
-  input[type="text"],
-  input[type="email"],
-  textarea {
-    cursor: text !important;
-  }
+/* Ensure standard pointer interactivity and native cursor functionality */
+a,
+button,
+[role="button"],
+label,
+.cursor-pointer {
+  cursor: pointer;
+}
+.cursor-grab {
+  cursor: grab;
+}
+.cursor-grabbing {
+  cursor: grabbing;
+}
+input[type="text"],
+input[type="email"],
+textarea {
+  cursor: text;
 }
 
-/* Reduced motion preference */
+/* Reduced motion preference: disable sudden rapid movements without killing continuous ambient indicators */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
-  body {
-    cursor: auto !important;
-  }
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-duration: 0.15s !important;
     scroll-behavior: auto !important;
   }
 }
+

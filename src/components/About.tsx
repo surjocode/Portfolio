@@ -41,7 +41,7 @@ export default function About() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: false, amount: 0.2 }}
           transition={{ duration: 0.6 }}
           className="text-center max-w-2xl mx-auto mb-16"
         >
@@ -62,7 +62,7 @@ export default function About() {
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: false, amount: 0.2 }}
             transition={{ duration: 0.7 }}
             className="lg:col-span-5 flex flex-col items-center"
           >
@@ -113,7 +113,7 @@ export default function About() {
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: false, amount: 0.2 }}
             transition={{ duration: 0.7 }}
             className="lg:col-span-7 space-y-6 text-slate-700 dark:text-slate-300 leading-relaxed text-base sm:text-lg"
           >
@@ -182,7 +182,7 @@ export default function About() {
               key={idx}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: false, amount: 0.2 }}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
               className="p-5 rounded-xl bg-white/90 dark:bg-surface-card/70 border border-slate-200 dark:border-slate-800 hover:border-cyan-500/40 hover:bg-white dark:hover:bg-surface-card transition-all duration-300 group shadow-sm"
             >

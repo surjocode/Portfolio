@@ -41,50 +41,55 @@ export default function Hero3DObject({ reducedMotion = false }: Hero3DObjectProp
     return [pos, col];
   }, [particleCount]);
 
+  const pointsRef = useRef<THREE.Points>(null);
+
   useFrame((state, delta) => {
-    if (reducedMotion) return;
+    // If reducedMotion is true, run at a calm pace rather than freezing completely
+    const speedMultiplier = reducedMotion ? 0.3 : 1.0;
+    // Cap delta at 0.1s to prevent teleporting or large jumps when browser tab wakes up
+    const safeDelta = Math.min(delta, 0.1);
 
-    const time = state.clock.getElapsedTime();
-
-    // Subtle mouse responsive rotation on the main group
+    // Responsive mouse tilt tracking on the main group
     if (groupRef.current) {
-      const targetX = (state.pointer.y * Math.PI) / 10;
-      const targetY = (state.pointer.x * Math.PI) / 8;
+      const targetX = (state.pointer.y * Math.PI) / 8;
+      const targetY = (state.pointer.x * Math.PI) / 6;
+
       groupRef.current.rotation.x = THREE.MathUtils.damp(
         groupRef.current.rotation.x,
         targetX,
-        3,
-        delta
+        4,
+        safeDelta
       );
-      groupRef.current.rotation.y = THREE.MathUtils.damp(
-        groupRef.current.rotation.y,
-        targetY + time * 0.15,
-        3,
-        delta
-      );
+      // Continuous ambient rotation on Y
+      groupRef.current.rotation.y += safeDelta * 0.2 * speedMultiplier;
     }
 
-    // Outer wireframe rotation
+    // Outer wireframe continuous rotation
     if (outerWireRef.current) {
-      outerWireRef.current.rotation.x = time * 0.25;
-      outerWireRef.current.rotation.y = time * 0.35;
+      outerWireRef.current.rotation.x += safeDelta * 0.3 * speedMultiplier;
+      outerWireRef.current.rotation.y += safeDelta * 0.4 * speedMultiplier;
     }
 
-    // Inner glowing core rotation
+    // Inner glowing core rotation (counter-rotation for gyroscopic feel)
     if (innerCoreRef.current) {
-      innerCoreRef.current.rotation.x = -time * 0.3;
-      innerCoreRef.current.rotation.z = time * 0.2;
+      innerCoreRef.current.rotation.x -= safeDelta * 0.35 * speedMultiplier;
+      innerCoreRef.current.rotation.z += safeDelta * 0.25 * speedMultiplier;
     }
 
     // Gyroscopic Orbit Rings
     if (ring1Ref.current) {
-      ring1Ref.current.rotation.x = Math.PI / 3 + Math.sin(time * 0.5) * 0.2;
-      ring1Ref.current.rotation.y = time * 0.6;
+      ring1Ref.current.rotation.x += safeDelta * 0.2 * speedMultiplier;
+      ring1Ref.current.rotation.y += safeDelta * 0.6 * speedMultiplier;
     }
 
     if (ring2Ref.current) {
-      ring2Ref.current.rotation.x = -Math.PI / 4 + Math.cos(time * 0.5) * 0.2;
-      ring2Ref.current.rotation.z = -time * 0.5;
+      ring2Ref.current.rotation.x -= safeDelta * 0.25 * speedMultiplier;
+      ring2Ref.current.rotation.z -= safeDelta * 0.5 * speedMultiplier;
+    }
+
+    // Floating particles subtle ambient counter-spin
+    if (pointsRef.current) {
+      pointsRef.current.rotation.y -= safeDelta * 0.1 * speedMultiplier;
     }
   });
 
@@ -158,7 +163,7 @@ export default function Hero3DObject({ reducedMotion = false }: Hero3DObjectProp
         </mesh>
 
         {/* Floating Cyber Particle Field */}
-        <points>
+        <points ref={pointsRef}>
           <bufferGeometry>
             <bufferAttribute
               attach="attributes-position"
