@@ -63,17 +63,25 @@ export default function Navbar() {
           {/* Logo / Branding */}
           <Link
             href="#hero"
-            className="shrink-0 group flex items-center gap-2.5 text-base sm:text-lg lg:text-xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors hover:text-cyan-600 dark:hover:text-cyan-300"
+            className="shrink-0 group flex items-center gap-2.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60 rounded-lg"
             onClick={closeMenu}
-            aria-label="Piel Mitra Home"
+            aria-label="Piel Mitra – Full Stack Web Developer, go to home"
           >
-            <div className="shrink-0 flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-cyan-500/10 dark:bg-gradient-to-br dark:from-cyan-500/15 dark:via-purple-500/15 dark:to-transparent border border-cyan-500/30 text-cyan-600 dark:text-cyan-400 group-hover:border-cyan-400 group-hover:shadow-neon-cyan transition-all">
+            {/* Terminal icon badge */}
+            <div className="shrink-0 flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-cyan-500/10 dark:bg-gradient-to-br dark:from-cyan-500/15 dark:via-purple-500/10 dark:to-transparent border border-cyan-500/30 dark:border-cyan-500/40 text-cyan-600 dark:text-cyan-400 group-hover:border-cyan-400/70 group-hover:bg-cyan-500/15 group-hover:shadow-[0_0_14px_-3px_rgba(0,242,254,0.4)] transition-all duration-300">
               <Terminal className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-600 dark:text-cyan-400" />
             </div>
-            <span className="font-mono whitespace-nowrap flex items-center">
-              {siteConfig.name}
-              <span className="text-cyan-500 dark:text-cyan-400 inline-block animate-pulse ml-0.5">_</span>
-            </span>
+
+            {/* Name + subtitle stacked */}
+            <div className="flex flex-col leading-none gap-[3px]">
+              <span className="font-mono text-sm sm:text-base font-bold tracking-tight text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors duration-200 whitespace-nowrap">
+                {siteConfig.name}
+                <span className="text-cyan-500 dark:text-cyan-400 ml-0.5">_</span>
+              </span>
+              <span className="hidden sm:block font-mono text-[9px] sm:text-[10px] font-semibold tracking-[0.18em] uppercase text-cyan-600/70 dark:text-cyan-400/60 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors duration-200 whitespace-nowrap">
+                Full Stack Web Developer
+              </span>
+            </div>
           </Link>
 
           {/* Desktop & Tablet Navigation Links */}
