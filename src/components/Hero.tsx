@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { siteConfig, socialLinks } from "@/data/portfolio";
-import { ArrowDown, ArrowUpRight, Github, Linkedin, Mail, Sparkles, Terminal, Code2, User } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Github, Linkedin, Mail, Sparkles, Code2, User } from "lucide-react";
 import { motion } from "framer-motion";
 import CyberCanvasWrapper from "./3d/CyberCanvasWrapper";
 import ResumeButton from "./ResumeButton";
@@ -59,20 +59,13 @@ export default function Hero() {
               <span>{siteConfig.openToWork}</span>
             </div>
 
-            {/* Candidate Introduction & Headline */}
-            <div className="space-y-2 sm:space-y-2.5">
-              <h2 className="text-xs sm:text-sm md:text-base font-mono text-purple-600 dark:text-purple-400 tracking-wider flex items-center gap-2">
-                <span className="text-cyan-500 dark:text-cyan-400 font-bold">&gt;</span>
-                <span>const developer = &quot;{siteConfig.name}&quot;;</span>
-              </h2>
-
-              <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.14] pb-1">
-                Full Stack{" "}
-                <span className="text-gradient-cyan-purple inline-block">
-                  Web Developer
-                </span>
-              </h1>
-            </div>
+            {/* Main Headline */}
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.14] pb-1">
+              Full Stack{" "}
+              <span className="text-gradient-cyan-purple inline-block">
+                Web Developer
+              </span>
+            </h1>
 
             {/* Mobile Profile Image Presentation (Visible on < lg screens, below the introduction headline) */}
             <motion.div
@@ -168,38 +161,6 @@ export default function Hero() {
               </div>
             </div>
 
-            {/* Developer interactive terminal teaser card */}
-            <div className="w-full max-w-xl text-left rounded-xl bg-white/90 dark:bg-surface-card/90 border border-slate-200 dark:border-slate-800/90 p-3.5 sm:p-4 shadow-lg shadow-slate-200/50 dark:shadow-xl dark:shadow-black/50 backdrop-blur-md">
-              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-2 mb-2.5">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
-                  <span className="w-2.5 h-2.5 rounded-full bg-cyan-500/80"></span>
-                </div>
-                <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-mono">
-                  <Terminal className="w-3.5 h-3.5 text-cyan-500 dark:text-cyan-400" />
-                  <span>piel-mitra ~ dev profile</span>
-                </div>
-              </div>
-              <div className="font-mono text-[11px] sm:text-xs md:text-sm text-slate-700 dark:text-slate-300 space-y-1 overflow-x-auto">
-                <p>
-                  <span className="text-purple-600 dark:text-purple-400">const</span> candidate = &#123;
-                </p>
-                <p className="pl-3 sm:pl-4">
-                  name: <span className="text-cyan-700 dark:text-cyan-300">&quot;Piel Mitra&quot;</span>,
-                </p>
-                <p className="pl-3 sm:pl-4">
-                  role: <span className="text-cyan-700 dark:text-cyan-300">&quot;Full Stack Web Developer&quot;</span>,
-                </p>
-                <p className="pl-3 sm:pl-4">
-                  stack: [<span className="text-purple-700 dark:text-purple-300">&quot;React&quot;</span>, <span className="text-purple-700 dark:text-purple-300">&quot;Next.js&quot;</span>, <span className="text-purple-700 dark:text-purple-300">&quot;TypeScript&quot;</span>, <span className="text-purple-700 dark:text-purple-300">&quot;Node.js&quot;</span>, <span className="text-purple-700 dark:text-purple-300">&quot;MongoDB&quot;</span>],
-                </p>
-                <p className="pl-3 sm:pl-4">
-                  availability: <span className="text-teal-700 dark:text-teal-300">&quot;Remote Internships &amp; Roles&quot;</span>
-                </p>
-                <p>&#125;;</p>
-              </div>
-            </div>
           </motion.div>
 
           {/* Right Column: Hero Profile Showcase & 3D Interactive Animation */}

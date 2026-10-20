@@ -9,9 +9,8 @@ interface Particle {
   vx: number;
   vy: number;
   size: number;
-  color: string;
-  glowColor: string;
-  life: number;
+  colorBase: string; // e.g. "0,242,254"
+  life: number;    // 1.0 → 0
   decay: number;
 }
 
@@ -19,22 +18,24 @@ export default function ParticleCursor() {
   const { theme } = useTheme();
   const themeRef = useRef(theme);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [mounted, setMounted] = useState<boolean>(false);
+  const [mounted, setMounted] = useState(false);
 
+  // Keep themeRef current without re-running the main effect
   useEffect(() => {
     themeRef.current = theme;
   }, [theme]);
 
+  // Check eligibility once on mount
   useEffect(() => {
-    // Check eligibility: disable only on touch-only devices or if reduced motion is preferred
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const isTouchOnly = window.matchMedia("(pointer: coarse) and (hover: none)").matches;
-
-    if (prefersReducedMotion || isTouchOnly) {
-      return;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    const isTouchOnly = window.matchMedia(
+      "(pointer: coarse) and (hover: none)"
+    ).matches;
+    if (!prefersReducedMotion && !isTouchOnly) {
+      setMounted(true);
     }
-
-    setMounted(true);
   }, []);
 
   useEffect(() => {
@@ -42,127 +43,127 @@ export default function ParticleCursor() {
 
     const canvas = canvasRef.current;
     if (!canvas) return;
+
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
-    let animationFrameId: number;
-    let width = window.innerWidth;
-    let height = window.innerHeight;
+    // ── Size tracking ──────────────────────────────────────────────────────
+    // Store logical (CSS-pixel) size so the render loop always gets the latest.
+    const size = { w: window.innerWidth, h: window.innerHeight };
 
-    // High-DPI support
-    const updateCanvasDimensions = () => {
+    const applySize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = Math.floor(width * dpr);
-      canvas.height = Math.floor(height * dpr);
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
+      size.w = window.innerWidth;
+      size.h = window.innerHeight;
+
+      // Backing-store size (device pixels)
+      canvas.width  = Math.round(size.w * dpr);
+      canvas.height = Math.round(size.h * dpr);
+
+      // CSS display size (logical pixels)
+      canvas.style.width  = `${size.w}px`;
+      canvas.style.height = `${size.h}px`;
+
+      // Reset transform then apply DPR scale so we can draw in CSS pixels
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
     };
 
-    updateCanvasDimensions();
+    applySize();
 
+    // ── Particle pool ──────────────────────────────────────────────────────
     const particles: Particle[] = [];
-    let lastMouseX = -100;
-    let lastMouseY = -100;
-    let hasMoved = false;
 
-    // Vibrant cyber palette for dark mode and rich contrast palette for light mode
-    const getColors = (isLight: boolean) => {
-      if (isLight) {
-        const palettes = [
-          { color: "rgba(8, 145, 178, ", glow: "rgba(8, 145, 178, 0.4)" }, // deep cyan
-          { color: "rgba(99, 102, 241, ", glow: "rgba(99, 102, 241, 0.4)" }, // electric indigo
-          { color: "rgba(147, 51, 234, ", glow: "rgba(147, 51, 234, 0.4)" }, // purple
-          { color: "rgba(13, 148, 136, ", glow: "rgba(13, 148, 136, 0.4)" }, // teal
-        ];
-        return palettes[Math.floor(Math.random() * palettes.length)];
-      } else {
-        const palettes = [
-          { color: "rgba(0, 242, 254, ", glow: "rgba(0, 242, 254, 0.85)" }, // cyber cyan
-          { color: "rgba(56, 189, 248, ", glow: "rgba(56, 189, 248, 0.8)" }, // sky blue
-          { color: "rgba(168, 85, 247, ", glow: "rgba(168, 85, 247, 0.8)" }, // neon purple
-          { color: "rgba(236, 72, 153, ", glow: "rgba(236, 72, 153, 0.7)" }, // pink neon
-        ];
-        return palettes[Math.floor(Math.random() * palettes.length)];
-      }
+    // Color palettes – these are RGB triplets so we can inject alpha inline
+    const darkPalette  = ["0,242,254", "56,189,248", "168,85,247", "236,72,153"];
+    const lightPalette = ["8,145,178",  "99,102,241", "147,51,234", "13,148,136"];
+
+    const randomColor = (isLight: boolean) => {
+      const pal = isLight ? lightPalette : darkPalette;
+      return pal[Math.floor(Math.random() * pal.length)];
     };
 
-    const spawnParticles = (startX: number, startY: number, endX: number, endY: number) => {
+    const spawnAt = (x: number, y: number, prevX: number, prevY: number) => {
       const isLight =
         themeRef.current === "light" ||
         document.documentElement.classList.contains("light");
 
-      const dist = Math.hypot(endX - startX, endY - startY);
-      // Spawn at least 1 particle, and more along the trajectory if moving quickly
-      const steps = Math.min(Math.max(1, Math.floor(dist / 6)), 8);
+      const dist  = Math.hypot(x - prevX, y - prevY);
+      // At least 1 particle; more for faster movement, capped for perf
+      const count = Math.min(Math.max(1, Math.floor(dist / 5)), 10);
 
-      for (let i = 0; i < steps; i++) {
-        const t = (i + 1) / steps;
-        const x = startX + (endX - startX) * t + (Math.random() - 0.5) * 3;
-        const y = startY + (endY - startY) * t + (Math.random() - 0.5) * 3;
-        const palette = getColors(isLight);
+      for (let i = 0; i < count; i++) {
+        const t  = (i + 1) / count;
+        const px = prevX + (x - prevX) * t + (Math.random() - 0.5) * 2;
+        const py = prevY + (y - prevY) * t + (Math.random() - 0.5) * 2;
 
-        // Angle and drift
         const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 0.7 + 0.2;
+        const speed = Math.random() * 0.8 + 0.2;
 
         particles.push({
-          x,
-          y,
+          x: px,
+          y: py,
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed,
-          size: Math.random() * 2.5 + 3.0, // 3.0 - 5.5px radius
-          color: palette.color,
-          glowColor: palette.glow,
-          life: 1.0,
-          decay: Math.random() * 0.018 + 0.022, // Fades over ~30-45 frames
+          size:      Math.random() * 2.5 + 2.5,  // 2.5–5 px radius
+          colorBase: randomColor(isLight),
+          life:      1.0,
+          decay:     Math.random() * 0.02 + 0.02, // fades in ~25–50 frames
         });
       }
 
-      // Limit max active particles for optimal 60fps performance
-      if (particles.length > 90) {
-        particles.splice(0, particles.length - 90);
+      // Keep pool bounded
+      if (particles.length > 120) {
+        particles.splice(0, particles.length - 120);
       }
     };
 
-    const onMouseMove = (e: MouseEvent) => {
-      const currentX = e.clientX;
-      const currentY = e.clientY;
+    // ── Mouse tracking ─────────────────────────────────────────────────────
+    // Store coordinates in a ref so the rAF loop always reads current values
+    // without creating stale closures.
+    const mouse = { x: -200, y: -200, prevX: -200, prevY: -200, moved: false };
 
-      if (hasMoved) {
-        spawnParticles(lastMouseX, lastMouseY, currentX, currentY);
+    const onMouseMove = (e: MouseEvent) => {
+      const nx = e.clientX;
+      const ny = e.clientY;
+
+      if (mouse.moved) {
+        spawnAt(nx, ny, mouse.prevX, mouse.prevY);
       } else {
-        hasMoved = true;
-        spawnParticles(currentX, currentY, currentX, currentY);
+        mouse.moved = true;
+        spawnAt(nx, ny, nx, ny);
       }
 
-      lastMouseX = currentX;
-      lastMouseY = currentY;
+      mouse.prevX = mouse.x;
+      mouse.prevY = mouse.y;
+      mouse.x     = nx;
+      mouse.y     = ny;
     };
 
     const onMouseLeave = () => {
-      hasMoved = false;
+      mouse.moved = false;
     };
 
-    const onResize = () => {
-      updateCanvasDimensions();
-    };
-
-    window.addEventListener("mousemove", onMouseMove, { passive: true });
+    window.addEventListener("mousemove",   onMouseMove,   { passive: true });
     document.addEventListener("mouseleave", onMouseLeave);
+
+    // ── Resize handling ────────────────────────────────────────────────────
+    const onResize = () => applySize();
     window.addEventListener("resize", onResize, { passive: true });
 
-    // Animation frame render loop
+    // ── Render loop ────────────────────────────────────────────────────────
+    let rafId: number;
+
     const render = () => {
-      ctx.clearRect(0, 0, width, height);
+      // Always clear with the current logical dimensions
+      ctx.clearRect(0, 0, size.w, size.h);
 
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
+
+        // Advance physics
+        p.x    += p.vx;
+        p.y    += p.vy;
         p.life -= p.decay;
 
         if (p.life <= 0) {
@@ -170,31 +171,31 @@ export default function ParticleCursor() {
           continue;
         }
 
-        // Particle becomes smaller as it ages
-        const currentRadius = Math.max(0.5, p.size * Math.pow(p.life, 1.1));
-        // Particle fades away gradually
-        const currentAlpha = Math.max(0, p.life * 0.92);
+        const radius = Math.max(0.3, p.size * Math.pow(p.life, 0.9));
+        const alpha  = Math.max(0, p.life * 0.95);
 
         ctx.save();
+        ctx.globalAlpha = alpha;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, currentRadius, 0, Math.PI * 2);
-        ctx.fillStyle = `${p.color}${currentAlpha})`;
-        ctx.shadowColor = p.glowColor;
-        ctx.shadowBlur = 5;
+        ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgb(${p.colorBase})`;
+        ctx.shadowColor = `rgba(${p.colorBase},0.7)`;
+        ctx.shadowBlur  = 6;
         ctx.fill();
         ctx.restore();
       }
 
-      animationFrameId = requestAnimationFrame(render);
+      rafId = requestAnimationFrame(render);
     };
 
-    animationFrameId = requestAnimationFrame(render);
+    rafId = requestAnimationFrame(render);
 
+    // ── Cleanup ────────────────────────────────────────────────────────────
     return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener("mousemove", onMouseMove);
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("mousemove",   onMouseMove);
       document.removeEventListener("mouseleave", onMouseLeave);
-      window.removeEventListener("resize", onResize);
+      window.removeEventListener("resize",      onResize);
     };
   }, [mounted]);
 
@@ -204,7 +205,15 @@ export default function ParticleCursor() {
     <canvas
       ref={canvasRef}
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-[9999] w-full h-full"
+      style={{
+        position:      "fixed",
+        top:           0,
+        left:          0,
+        pointerEvents: "none",
+        zIndex:        9999,
+        display:       "block",
+        visibility:    "visible",
+      }}
     />
   );
 }
